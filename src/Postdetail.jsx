@@ -15,7 +15,7 @@ function Post() {
   const fetchPosts = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/v1/posts/${postId}`
+        `${import.meta.env.VITE_API_ENDPOINT}/${postId}`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -39,20 +39,21 @@ function Post() {
     return <div>{error}</div>;
   }
 
-//   TODO: Add "Add comment" button and request to server
+  //   TODO: Add "Add comment" button and request to server
   return (
     <div>
       <h1>Title: {post.title}</h1>
-      <h2>Modified Date: {(new Date(post.updatedAt)).toLocaleDateString()}</h2>
+      <h2>Modified Date: {new Date(post.updatedAt).toLocaleDateString()}</h2>
       <p>Content:</p>
       <p>{post.content}</p>
 
       <h2>Comments</h2>
       <ul>
         {comments.map((comment) => (
-          <li key={comment.id}>{comment.content} - {comment.authorName}</li>
+          <li key={comment.id}>
+            {comment.content} - {comment.authorName}
+          </li>
         ))}
-        
       </ul>
     </div>
   );

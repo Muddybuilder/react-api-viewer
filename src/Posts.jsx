@@ -12,7 +12,7 @@ function Posts() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/v1/posts");
+      const response = await fetch(`${import.meta.env.VITE_API_ENDPOINT}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
