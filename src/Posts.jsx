@@ -16,9 +16,7 @@ function Posts() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      console.log("response came!");
       const data = await response.json();
-      console.log(data);
       setPosts(data);
       setIsLoading(false);
     } catch (error) {

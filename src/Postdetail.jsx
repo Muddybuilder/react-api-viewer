@@ -7,50 +7,40 @@ function Post() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { postId } = useParams();
-  const [newComment, setNewComment] = useState({ username: "", content: "" });
   const [isCommentFormVisible, setIsCommentFormVisible] = useState(false);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewComment(prev => ({ ...prev, [name]: value }));
-  };
-
-   //TODO: Figure out why this fails
-  const handleAddComment = async () => {
-    const authorName = newComment.username;
-    const content = newComment.content;
-    console.log(authorName, content)
+  //TODO: Figure out why this fails
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    const authorName = e.currentTarget.username.value;
+    const content = e.currentTarget.comment.value;
     if (content) {
       try {
         const headers = new Headers({
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         });
-        console.log("posting....")
-        console.log(`${import.meta.env.VITE_API_ENDPOINT}/${postId}/comments`)
+        const url = `${import.meta.env.VITE_API_ENDPOINT}/${postId}/comments`;
 
-        const response = await fetch(
-          `${import.meta.env.VITE_API_ENDPOINT}/${postId}/comments`,
-          {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify({ authorName, content }),
-          }
-        );
+        const response = await fetch(url, {
+          method: "POST",
+          headers: headers,
+          body: JSON.stringify({ authorName, content }),
+        });
 
         setIsCommentFormVisible(false);
 
+        const data = await response.json();
+
+
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error("Network response was not ok.. : " + `${data.message}`);
         }
-  
+
         // Refresh the comments
         fetchPosts();
       } catch (error) {
         console.error("Error adding comment:", error);
+        setError(error)
       }
     }
   };
@@ -62,7 +52,6 @@ function Post() {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      console.log("response came!");
       const data = await response.json();
       setPost(data.post);
       setComments(data.comments);
@@ -72,6 +61,10 @@ function Post() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -102,26 +95,16 @@ function Post() {
       )}
       {isCommentFormVisible && (
         <form onSubmit={handleAddComment}>
-          <input
-            type="text"
-            name="username"
-            defaultValue={""}
-            onChange={handleInputChange}
-            placeholder="Your username"
-          />
-          <textarea
-            name="content"
-            defaultValue={""}
-            onChange={handleInputChange}
-            placeholder="Your comment"
-            required
-          />
+          <label htmlFor="username">Username:</label>
+          <input id="username" type="text" />
+          <label htmlFor="comment">Comment:</label>
+          <input id="comment" type="text" />
           <button type="submit">Submit Comment</button>
           <button type="button" onClick={() => setIsCommentFormVisible(false)}>
             Cancel
           </button>
         </form>
-      )}{" "}
+      )}
     </div>
   );
 }
